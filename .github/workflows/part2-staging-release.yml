@@ -36,7 +36,7 @@ jobs:
             -Djib.from.image=eclipse-temurin:17.0.4_8-jre-alpine \
             -Djib.to.image=yudai.azurecr.io/todolist \
             -Djib.to.tags=v1.0.0-tem_17.0.4_8-jre-alpine_$GITHUB_SHA,latest \
-            -Djib.container.entrypoint=sh,webapp_startup.sh \ -Djib.container.ports=8080 \
+            -Djib.container.entrypoint=sh,webapp_startup.sh \ -Djib.container.ports=8080,2222 \
             -Djib.container.environment=JDK_JAVA_OPTIONS="-Xmx512m -XX:StartFlightRecording"
 
       - name: Update Staging Slot with the Latest Image
