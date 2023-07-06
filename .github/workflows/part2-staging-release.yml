@@ -1,0 +1,46 @@
+name: Staging Release(Part2)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/part2/**"
+
+jobs:
+  push_image:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: apps/part2
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build & Push Image
+        run: |
+          az config set defaults.acr=yudai
+          az acr login
+          mvn compile test com.google.cloud.tools:jib-maven-plugin:3.2.1:build \
+            -Djib.from.image=eclipse-temurin:17.0.4_8-jre-alpine \
+            -Djib.to.image=yudai.azurecr.io/todolist \
+            -Djib.to.tags=v1.0.0-tem_17.0.4_8-jre-alpine_$GITHUB_SHA,latest \
+            -Djib.container.entrypoint=sh,webapp_startup.sh \ -Djib.container.ports=8080,2222 \
+            -Djib.container.environment=JDK_JAVA_OPTIONS="-Xmx512m -XX:StartFlightRecording"
+
+      - name: Update Staging Slot with the Latest Image
+        run: |
+          az webapp config container set --resource-group book_container \
+            --name yudaicontainer --slot staging \
+            --docker-custom-image-name yudai.azurecr.io/todolist:v1.0.0-tem_17.0.4_8-jre-alpine_$GITHUB_SHA
