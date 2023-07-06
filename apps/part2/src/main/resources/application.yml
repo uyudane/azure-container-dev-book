@@ -13,5 +13,5 @@ server:
 # azure プロファイルに変更すると、Azure 上にデプロイした際に使用される設定に切り替わります。
 spring:
   profiles:
-    active: embedded
-    #active: azure
+    # active: embedded
+    active: azure

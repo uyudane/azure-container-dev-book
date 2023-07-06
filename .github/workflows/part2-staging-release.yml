@@ -43,5 +43,5 @@ jobs:
       - name: Update Staging Slot with the Latest Image
         run: |
           az webapp config container set --resource-group book_container \
-            --name yudaicontainer --slot staging \
+            --name yudaicontainer \
             --docker-custom-image-name yudai.azurecr.io/todolist:v1.0.0-tem_17.0.4_8-jre-alpine_$GITHUB_SHA
